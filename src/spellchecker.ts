@@ -1,6 +1,12 @@
 import { promises as fs } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 import { type Dictionary } from "./types";
 import { parseAff, parseDic } from "./parser";
+
+// Get package root directory for loading default dictionaries
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const DEFAULT_DICT_PATH = join(__dirname, "..", "data");
 
 export class SpellChecker {
   private dictionary: Dictionary;
@@ -23,20 +29,34 @@ export class SpellChecker {
     this.suggestionCache = new Map();
   }
 
-  async loadDictionary(affPath: string, dicPath: string): Promise<void> {
-    const [affContent, dicContent] = await Promise.all([
-      fs.readFile(affPath, "utf-8"),
-      fs.readFile(dicPath, "utf-8"),
-    ]);
+  /**
+   * Load dictionary files. If no paths are provided, loads the default en_US dictionary.
+   */
+  async loadDictionary(affPath?: string, dicPath?: string): Promise<void> {
+    const finalAffPath = affPath || join(DEFAULT_DICT_PATH, "en_US-web.aff");
+    const finalDicPath = dicPath || join(DEFAULT_DICT_PATH, "en_US-web.dic");
 
-    const affixData = parseAff(affContent);
-    this.dictionary = {
-      ...affixData,
-      words: parseDic(dicContent, affixData.rules),
-    };
-    // Clear caches when dictionary is reloaded
-    this.wordCache.clear();
-    this.suggestionCache.clear();
+    try {
+      const [affContent, dicContent] = await Promise.all([
+        fs.readFile(finalAffPath, "utf-8"),
+        fs.readFile(finalDicPath, "utf-8"),
+      ]);
+
+      const affixData = parseAff(affContent);
+      this.dictionary = {
+        ...affixData,
+        words: parseDic(dicContent, affixData.rules),
+      };
+      // Clear caches when dictionary is reloaded
+      this.wordCache.clear();
+      this.suggestionCache.clear();
+    } catch (error) {
+      throw new Error(
+        `Failed to load dictionary: ${
+          (error as Error)?.message || "Unknown error"
+        }`
+      );
+    }
   }
 
   private isSpecialCase(word: string): boolean {

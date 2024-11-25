@@ -1,10 +1,27 @@
 {
   "name": "fast-spell",
   "version": "0.0.0",
+  "author": "The-Best-Codes",
+  "description": "A fast and lightweight spell checker library",
   "type": "module",
-  "module": "index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "data"
+  ],
   "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --target node --minify",
+    "test": "bun test",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "bun run clean && bun run build",
     "start": "bun run index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/The-Best-Codes/fast-spell"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
