@@ -50,7 +50,7 @@ export function parseAff(content: string): Omit<Dictionary, "words"> {
               pattern,
               regex: new RegExp("^" + pattern + "$"),
             });
-          } catch (e) {
+          } catch {
             console.warn(`Invalid compound rule pattern: ${pattern}`);
           }
         }

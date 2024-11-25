@@ -1,9 +1,12 @@
-import { readFileSync } from "fs";
+import { promises as fs } from "fs";
 import { type Dictionary } from "./types";
 import { parseAff, parseDic } from "./parser";
 
 export class SpellChecker {
   private dictionary: Dictionary;
+  private wordCache: Map<string, boolean>;
+  private suggestionCache: Map<string, string[]>;
+  private readonly MAX_SUGGESTIONS = 10;
 
   constructor() {
     this.dictionary = {
@@ -16,17 +19,24 @@ export class SpellChecker {
       wordChars: "",
       iconvRules: [],
     };
+    this.wordCache = new Map();
+    this.suggestionCache = new Map();
   }
 
-  loadDictionary(affPath: string, dicPath: string): void {
-    const affContent = readFileSync(affPath, "utf-8");
-    const dicContent = readFileSync(dicPath, "utf-8");
+  async loadDictionary(affPath: string, dicPath: string): Promise<void> {
+    const [affContent, dicContent] = await Promise.all([
+      fs.readFile(affPath, "utf-8"),
+      fs.readFile(dicPath, "utf-8"),
+    ]);
 
     const affixData = parseAff(affContent);
     this.dictionary = {
       ...affixData,
       words: parseDic(dicContent, affixData.rules),
     };
+    // Clear caches when dictionary is reloaded
+    this.wordCache.clear();
+    this.suggestionCache.clear();
   }
 
   private isSpecialCase(word: string): boolean {
@@ -62,39 +72,57 @@ export class SpellChecker {
   }
 
   public isCorrect(word: string): boolean {
+    // Check cache first
+    const cached = this.wordCache.get(word);
+    if (cached !== undefined) return cached;
+
     // First apply any character conversions
     word = this.applyIConvRules(word);
 
+    let result = false;
+
     // Check if it's in dictionary as-is
-    if (this.dictionary.words.has(word)) return true;
-
+    if (this.dictionary.words.has(word)) result = true;
     // Check lowercase version
-    if (this.dictionary.words.has(word.toLowerCase())) return true;
-
+    else if (this.dictionary.words.has(word.toLowerCase())) result = true;
     // Check special cases
-    if (this.isSpecialCase(word)) return true;
-
+    else if (this.isSpecialCase(word)) result = true;
     // Check compound rules
-    if (this.checkCompoundRules(word)) return true;
+    else if (this.checkCompoundRules(word)) result = true;
 
-    return false;
+    // Cache the result
+    this.wordCache.set(word, result);
+    return result;
   }
 
   public getSuggestions(word: string): string[] {
+    // Check cache first
+    const cached = this.suggestionCache.get(word);
+    if (cached !== undefined) return cached;
+
     const suggestions = new Set<string>();
     const lowWord = word.toLowerCase();
 
     // If the word is correct, no need for suggestions
     if (this.isCorrect(lowWord)) return [];
 
-    // Try common replacements first (REP rules)
+    // Try common replacements first (REP rules) as they're usually more accurate
     this.addReplacementSuggestions(lowWord, suggestions);
 
-    // Also try edit distance based suggestions
+    // If we already have enough suggestions, return them
+    if (suggestions.size >= this.MAX_SUGGESTIONS) {
+      const result = Array.from(suggestions).slice(0, this.MAX_SUGGESTIONS);
+      this.suggestionCache.set(word, result);
+      return result;
+    }
+
+    // Otherwise try edit distance based suggestions
     this.addEditDistanceSuggestions(lowWord, suggestions);
 
-    // Return all unique suggestions
-    return Array.from(suggestions);
+    // Cache and return results
+    const result = Array.from(suggestions).slice(0, this.MAX_SUGGESTIONS);
+    this.suggestionCache.set(word, result);
+    return result;
   }
 
   private addReplacementSuggestions(
