@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "build": "bun build ./src/index.ts --outdir ./dist --target node --minify",
+    "lint": "bunx eslint .",
     "test": "bun test",
     "clean": "rm -rf dist",
     "prepublishOnly": "bun run clean && bun run build",
