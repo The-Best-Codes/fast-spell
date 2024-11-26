@@ -24,6 +24,17 @@
     "type": "git",
     "url": "https://github.com/The-Best-Codes/fast-spell"
   },
+  "keywords": [
+    "spell",
+    "checker",
+    "spellcheck",
+    "spellchecker",
+    "dictionary",
+    "affix",
+    "affix-rules",
+    "fast",
+    "lightweight"
+  ],
   "devDependencies": {
     "@eslint/js": "^9.15.0",
     "@types/bun": "^1.1.13",
