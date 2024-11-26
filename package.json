@@ -9,8 +9,7 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist",
-    "README.md",
-    "data"
+    "README.md"
   ],
   "scripts": {
     "build": "bun run build.ts && bun run build.types",
