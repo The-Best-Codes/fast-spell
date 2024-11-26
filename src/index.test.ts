@@ -29,16 +29,16 @@ describe("SpellChecker", () => {
   it("should suggest corrections", () => {
     const suggestions = spellChecker.suggest("helo");
     expect(suggestions).toContain("hello");
-    
+
     // Test more cases
     const misspellings = {
-      "tset": "test",
-      "wrld": "world",
-      "programing": "programming",
-      "recieve": "receive",
-      "seperate": "separate"
+      tset: "test",
+      wrld: "world",
+      programing: "programming",
+      recieve: "receive",
+      seperate: "separate",
     };
-    
+
     for (const [misspelled, correct] of Object.entries(misspellings)) {
       const suggs = spellChecker.suggest(misspelled);
       expect(suggs).toContain(correct);

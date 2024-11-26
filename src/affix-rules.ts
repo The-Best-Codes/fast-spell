@@ -5,7 +5,7 @@ export interface AffixEntry {
 }
 
 export interface AffixRule {
-  type: 'PFX' | 'SFX';
+  type: "PFX" | "SFX";
   flag: string;
   crossProduct: boolean;
   entries: AffixEntry[];
@@ -15,22 +15,22 @@ export class AffixRules {
   private rules: Map<string, AffixRule[]>;
   private cache: Map<string, Set<string>>;
   private readonly CACHE_SIZE = 10000;
-  
+
   constructor() {
     this.rules = new Map();
     this.cache = new Map();
   }
-  
+
   addRule(rule: AffixRule): void {
     const existing = this.rules.get(rule.flag) || [];
     existing.push(rule);
     this.rules.set(rule.flag, existing);
   }
-  
+
   private getCachedVariations(word: string): Set<string> | undefined {
     return this.cache.get(word);
   }
-  
+
   private cacheVariations(word: string, variations: Set<string>): void {
     if (this.cache.size >= this.CACHE_SIZE) {
       // Remove oldest entries when cache is full
@@ -42,20 +42,23 @@ export class AffixRules {
     }
     this.cache.set(word, variations);
   }
-  
+
   findBaseWords(word: string): Set<string> {
     // Check cache first
     const cached = this.getCachedVariations(word);
     if (cached) return cached;
-    
+
     const baseWords = new Set<string>();
-    
+
     // Try removing prefixes
     for (const [, rules] of this.rules) {
       for (const rule of rules) {
-        if (rule.type === 'PFX') {
+        if (rule.type === "PFX") {
           for (const entry of rule.entries) {
-            if (word.startsWith(entry.add) && this.matchesCondition(word, entry.condition)) {
+            if (
+              word.startsWith(entry.add) &&
+              this.matchesCondition(word, entry.condition)
+            ) {
               const base = entry.strip + word.slice(entry.add.length);
               baseWords.add(base);
             }
@@ -63,13 +66,16 @@ export class AffixRules {
         }
       }
     }
-    
+
     // Try removing suffixes
     for (const [, rules] of this.rules) {
       for (const rule of rules) {
-        if (rule.type === 'SFX') {
+        if (rule.type === "SFX") {
           for (const entry of rule.entries) {
-            if (word.endsWith(entry.add) && this.matchesCondition(word, entry.condition)) {
+            if (
+              word.endsWith(entry.add) &&
+              this.matchesCondition(word, entry.condition)
+            ) {
               const base = word.slice(0, -entry.add.length) + entry.strip;
               baseWords.add(base);
             }
@@ -77,13 +83,13 @@ export class AffixRules {
         }
       }
     }
-    
+
     // Cache results
     this.cacheVariations(word, baseWords);
-    
+
     return baseWords;
   }
-  
+
   private matchesCondition(word: string, condition: string): boolean {
     if (!condition) return true;
     try {
@@ -92,15 +98,15 @@ export class AffixRules {
       return false;
     }
   }
-  
+
   generateVariations(word: string): Set<string> {
     const variations = new Set<string>();
     variations.add(word);
-    
+
     // Apply prefixes
     for (const [, rules] of this.rules) {
       for (const rule of rules) {
-        if (rule.type === 'PFX') {
+        if (rule.type === "PFX") {
           for (const entry of rule.entries) {
             if (this.matchesCondition(word, entry.condition)) {
               if (entry.strip) {
@@ -115,16 +121,18 @@ export class AffixRules {
         }
       }
     }
-    
+
     // Apply suffixes
     for (const [, rules] of this.rules) {
       for (const rule of rules) {
-        if (rule.type === 'SFX') {
+        if (rule.type === "SFX") {
           for (const entry of rule.entries) {
             if (this.matchesCondition(word, entry.condition)) {
               if (entry.strip) {
                 if (word.endsWith(entry.strip)) {
-                  variations.add(word.slice(0, -entry.strip.length) + entry.add);
+                  variations.add(
+                    word.slice(0, -entry.strip.length) + entry.add
+                  );
                 }
               } else {
                 variations.add(word + entry.add);
@@ -134,7 +142,7 @@ export class AffixRules {
         }
       }
     }
-    
+
     return variations;
   }
 }
