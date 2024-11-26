@@ -13,12 +13,13 @@
     "data"
   ],
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --target node --minify",
+    "build": "bun run build.ts && bun run build.types",
+    "build.ts": "bun build ./src/index.ts --outdir ./dist --target node --minify",
+    "build.types": "rm -rf dist/*.d.ts && tsc --project tsconfig.json --emitDeclarationOnly --declarationDir ./dist && find dist -name '*.d.ts' ! -name 'index.d.ts' -type f -delete",
     "lint": "bunx eslint .",
     "test": "bun test",
     "clean": "rm -rf dist",
-    "prepublishOnly": "bun run clean && bun run build",
-    "start": "bun run index.ts"
+    "prepublishOnly": "bun run clean && bun run build"
   },
   "repository": {
     "type": "git",
@@ -26,13 +27,13 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
-    "@types/bun": "latest",
-    "bun-types": "^1.1.36",
+    "@types/bun": "^1.1.13",
+    "bun-types": "^1.1.37",
     "eslint": "^9.15.0",
     "globals": "^15.12.0",
-    "typescript-eslint": "^8.15.0"
+    "typescript-eslint": "^8.16.0"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.7.2"
   }
 }
