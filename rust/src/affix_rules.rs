@@ -1,4 +1,5 @@
-use std::collections::{HashMap, HashSet};
+use rustc_hash::{FxHashMap, FxHashSet};
+use smallvec::{SmallVec, smallvec};
 
 #[derive(Clone)]
 pub struct AffixEntry {
@@ -16,80 +17,83 @@ pub struct AffixRule {
 }
 
 pub struct AffixRules {
-    rules: HashMap<String, Vec<AffixRule>>,
-    cache: HashMap<String, HashSet<String>>,
+    rules: FxHashMap<String, SmallVec<[AffixRule; 4]>>,
+    cache: FxHashMap<String, FxHashSet<String>>,
     cache_size: usize,
 }
 
 impl AffixRules {
     pub fn new() -> Self {
         AffixRules {
-            rules: HashMap::new(),
-            cache: HashMap::new(),
+            rules: FxHashMap::default(),
+            cache: FxHashMap::default(),
             cache_size: 10000,
         }
     }
 
     pub fn add_rule(&mut self, rule: AffixRule) {
-        self.rules.entry(rule.flag.clone()).or_default().push(rule);
+        self.rules.entry(rule.flag.clone())
+            .or_insert_with(|| smallvec![])
+            .push(rule);
     }
 
-    pub fn find_base_words(&mut self, word: &str) -> HashSet<String> {
-        if let Some(cached) = self.cache.get(word) {
-            return cached.clone();
-        }
-
-        let mut base_words = HashSet::new();
-        
+    #[inline]
+    pub fn find_base_words_into(&self, word: &str, base_words: &mut SmallVec<[String; 4]>) {
         // Try prefix rules
         for rules in self.rules.values() {
             for rule in rules {
-                if rule.rule_type == "PFX" {
-                    for entry in &rule.entries {
-                        if word.starts_with(&entry.add) {
-                            let potential_base = if entry.strip == "0" {
-                                word[entry.add.len()..].to_string()
-                            } else {
-                                if word.len() > entry.add.len() {
-                                    word[entry.add.len()..].to_string()
-                                } else {
-                                    continue;
+                match rule.rule_type.as_str() {
+                    "PFX" => {
+                        for entry in &rule.entries {
+                            if word.starts_with(&entry.add) {
+                                if entry.strip == "0" {
+                                    if let Some(base) = word.get(entry.add.len()..) {
+                                        base_words.push(base.to_string());
+                                    }
+                                } else if word.len() > entry.add.len() {
+                                    if let Some(base) = word.get(entry.add.len()..) {
+                                        base_words.push(base.to_string());
+                                    }
                                 }
-                            };
-                            base_words.insert(potential_base);
+                            }
                         }
                     }
-                }
-                // Try suffix rules
-                else if rule.rule_type == "SFX" {
-                    for entry in &rule.entries {
-                        if word.ends_with(&entry.add) {
-                            let potential_base = if entry.strip == "0" {
-                                word[..word.len() - entry.add.len()].to_string()
-                            } else {
-                                if word.len() > entry.add.len() {
-                                    word[..word.len() - entry.add.len()].to_string()
-                                } else {
-                                    continue;
+                    "SFX" => {
+                        for entry in &rule.entries {
+                            if word.ends_with(&entry.add) {
+                                if entry.strip == "0" {
+                                    if let Some(base) = word.get(..word.len() - entry.add.len()) {
+                                        base_words.push(base.to_string());
+                                    }
+                                } else if word.len() > entry.add.len() {
+                                    if let Some(base) = word.get(..word.len() - entry.add.len()) {
+                                        base_words.push(base.to_string());
+                                    }
                                 }
-                            };
-                            base_words.insert(potential_base);
+                            }
                         }
                     }
+                    _ => {}
                 }
             }
         }
 
         // If no base words found, the word might be a base word itself
         if base_words.is_empty() {
-            base_words.insert(word.to_string());
+            base_words.push(word.to_string());
         }
+    }
 
-        self.cache_variations(word, base_words.clone());
+    // Keep the original method for backward compatibility
+    pub fn find_base_words(&self, word: &str) -> FxHashSet<String> {
+        let mut base_words = FxHashSet::default();
+        let mut temp: SmallVec<[String; 4]> = smallvec![];
+        self.find_base_words_into(word, &mut temp);
+        base_words.extend(temp);
         base_words
     }
 
-    fn cache_variations(&mut self, word: &str, variations: HashSet<String>) {
+    fn cache_variations(&mut self, word: &str, variations: FxHashSet<String>) {
         if self.cache.len() >= self.cache_size {
             // Remove oldest entries when cache is full
             let keys: Vec<_> = self.cache.keys().cloned().collect();
