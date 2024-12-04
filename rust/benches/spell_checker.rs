@@ -1,8 +1,8 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use rust::{SpellChecker};
+use fast_spell::{SpellChecker};
 use std::time::{Duration, Instant};
 
-const ITERATIONS: usize = 10000;
+const ITERATIONS: usize = 1000;
 const WARM_UP_ITERATIONS: usize = 1000;
 
 fn format_duration(duration: Duration) -> String {
