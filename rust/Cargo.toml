@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-rustc-hash = "1.1"
+rustc-hash = "2.0"
 lasso = "0.7"
 bstr = "1.9"
 smallvec = { version = "1.11", features = ["const_generics"] }
