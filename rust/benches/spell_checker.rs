@@ -88,7 +88,7 @@ fn spell_checker_benchmark(c: &mut Criterion) {
 
     // Manual benchmarking for more detailed output
     println!("\nDetailed benchmarks:");
-    
+
     // Benchmark initialization
     let start = Instant::now();
     let _spell_checker = SpellChecker::new("data/en_US-web.dic", "data/en_US-web.aff");

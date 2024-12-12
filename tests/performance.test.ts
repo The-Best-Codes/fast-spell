@@ -59,7 +59,7 @@ describe("SpellChecker Performance", () => {
   function runBenchmark(
     name: string,
     fn: () => void,
-    iterations: number = ITERATIONS
+    iterations: number = ITERATIONS,
   ) {
     // Warm up
     console.log(`\nWarming up ${name}...`);
@@ -127,7 +127,7 @@ describe("SpellChecker Performance", () => {
     const start = performance.now();
     spellChecker = new SpellChecker(
       join(__dirname, "../data/en_US-web.dic"),
-      join(__dirname, "../data/en_US-web.aff")
+      join(__dirname, "../data/en_US-web.aff"),
     );
     const end = performance.now();
     const loadTime = (end - start) * 1000000;
@@ -178,7 +178,7 @@ describe("SpellChecker Performance", () => {
     console.log(
       `Operations/sec improvement: ${
         cachedResults.opsPerSec - uncachedResults.opsPerSec
-      }`
+      }`,
     );
   });
 
@@ -214,7 +214,7 @@ describe("SpellChecker Performance", () => {
           spellChecker.suggest(word);
         }
       },
-      1000
+      1000,
     ); // Fewer iterations for suggestions as they're more expensive
   });
 
@@ -239,7 +239,7 @@ describe("SpellChecker Performance", () => {
           }
         }
       },
-      1000
+      1000,
     );
   });
 
@@ -249,18 +249,18 @@ describe("SpellChecker Performance", () => {
       ...Array(100)
         .fill(0)
         .map(
-          () => correctWords[Math.floor(Math.random() * correctWords.length)]
+          () => correctWords[Math.floor(Math.random() * correctWords.length)],
         ),
       ...Array(100)
         .fill(0)
         .map(
           () =>
-            incorrectWords[Math.floor(Math.random() * incorrectWords.length)]
+            incorrectWords[Math.floor(Math.random() * incorrectWords.length)],
         ),
       ...Array(100)
         .fill(0)
         .map(
-          () => affixedWords[Math.floor(Math.random() * affixedWords.length)]
+          () => affixedWords[Math.floor(Math.random() * affixedWords.length)],
         ),
     ];
 
@@ -271,7 +271,7 @@ describe("SpellChecker Performance", () => {
           spellChecker.check(word);
         }
       },
-      100
+      100,
     );
 
     // Memory usage
@@ -279,7 +279,7 @@ describe("SpellChecker Performance", () => {
     console.log("\nMemory Usage:");
     for (const [key, value] of Object.entries(used)) {
       console.log(
-        `${key}: ${Math.round((value / 1024 / 1024) * 100) / 100} MB`
+        `${key}: ${Math.round((value / 1024 / 1024) * 100) / 100} MB`,
       );
     }
   });

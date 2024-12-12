@@ -5,7 +5,7 @@ import { join } from "path";
 describe("SpellChecker", () => {
   const spellChecker = new SpellChecker(
     join(__dirname, "../data/en_US-web.dic"),
-    join(__dirname, "../data/en_US-web.aff")
+    join(__dirname, "../data/en_US-web.aff"),
   );
 
   it("should check correct words", () => {

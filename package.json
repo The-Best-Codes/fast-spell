@@ -1,6 +1,6 @@
 {
   "name": "fast-spell",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "The-Best-Codes",
   "description": "A fast and lightweight spell checker library",
   "license": "MIT",
@@ -42,7 +42,7 @@
     "bun-types": "^1.1.38",
     "eslint": "^9.16.0",
     "globals": "^15.13.0",
-    "typescript-eslint": "^8.17.0"
+    "typescript-eslint": "^8.18.0"
   },
   "peerDependencies": {
     "typescript": "^5.7.2"

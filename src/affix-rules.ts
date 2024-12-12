@@ -131,7 +131,7 @@ export class AffixRules {
               if (entry.strip) {
                 if (word.endsWith(entry.strip)) {
                   variations.add(
-                    word.slice(0, -entry.strip.length) + entry.add
+                    word.slice(0, -entry.strip.length) + entry.add,
                   );
                 }
               } else {

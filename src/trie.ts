@@ -58,7 +58,7 @@ export class Trie {
     node: TrieNode,
     prefix: string,
     results: string[],
-    limit: number
+    limit: number,
   ): void {
     if (results.length >= limit) return;
 

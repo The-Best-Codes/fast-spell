@@ -1,6 +1,6 @@
 import { AffixRules } from "./affix-rules";
-import { Trie } from "./trie";
 import { DictionaryLoader } from "./dictionary-loader";
+import { Trie } from "./trie";
 
 export class SpellChecker {
   private trie: Trie;
@@ -54,7 +54,10 @@ export class SpellChecker {
     if (this.wordCheckCache.size >= this.WORD_CHECK_CACHE_SIZE) {
       // Remove oldest entries when cache is full
       const entriesToRemove = Math.floor(this.WORD_CHECK_CACHE_SIZE * 0.1);
-      const keys = Array.from(this.wordCheckCache.keys()).slice(0, entriesToRemove);
+      const keys = Array.from(this.wordCheckCache.keys()).slice(
+        0,
+        entriesToRemove,
+      );
       for (const key of keys) {
         this.wordCheckCache.delete(key);
       }
@@ -152,7 +155,7 @@ export class SpellChecker {
           suggestion.length <= word.length + 3 && // Allow longer words
           (suggestion.slice(0, 2).includes(word[0]) || // First letter appears in first two letters
             (word.length > 1 && suggestion.slice(0, 2).includes(word[1])) || // Second letter appears in first two letters
-            (suggestion.length > 1 && word.startsWith(suggestion[1]))) // Second letter of suggestion matches first letter of word
+            (suggestion.length > 1 && word.startsWith(suggestion[1]))), // Second letter of suggestion matches first letter of word
       )
       .map((suggestion) => ({
         word: suggestion,
@@ -189,7 +192,7 @@ export class SpellChecker {
       const entriesToRemove = Math.floor(this.SUGGESTION_CACHE_SIZE * 0.1);
       const keys = Array.from(this.suggestionCache.keys()).slice(
         0,
-        entriesToRemove
+        entriesToRemove,
       );
       for (const key of keys) {
         this.suggestionCache.delete(key);
@@ -246,7 +249,7 @@ export class SpellChecker {
           matrix[i][j] = Math.min(
             matrix[i - 1][j - 1] + 1,
             matrix[i][j - 1] + 1,
-            matrix[i - 1][j] + 1
+            matrix[i - 1][j] + 1,
           );
         }
       }

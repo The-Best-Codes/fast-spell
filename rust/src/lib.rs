@@ -27,7 +27,7 @@ impl SpellChecker {
     pub fn new(dic_path: &str, aff_path: &str) -> Self {
         let mut trie = Trie::new();
         let mut affix_rules = AffixRules::new();
-        
+
         // Load dictionary and rules in parallel
         rayon::join(
             || DictionaryLoader::load_dictionary(dic_path, &mut trie),
@@ -48,7 +48,7 @@ impl SpellChecker {
         // Convert to lowercase and intern the string
         let word_lower = word.to_lowercase();
         let word_id = self.string_interner.get_or_intern(&word_lower);
-        
+
         // Fast path: check cache
         if let Some(&cached) = self.word_check_cache.get(&word_id) {
             return cached;
@@ -63,9 +63,9 @@ impl SpellChecker {
         // Slow path: check affixes
         let mut base_words: SmallVec<[String; TYPICAL_MAX_AFFIXES]> = smallvec![];
         self.affix_rules.find_base_words_into(&word_lower, &mut base_words);
-        
+
         let result = base_words.par_iter().any(|base_word| self.trie.search(base_word));
-        
+
         self.cache_word_check(word_id, result);
         result
     }
@@ -79,7 +79,7 @@ impl SpellChecker {
                 .take(to_remove)
                 .copied()
                 .collect();
-            
+
             for key in keys {
                 self.word_check_cache.remove(&key);
             }
