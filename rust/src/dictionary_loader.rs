@@ -15,7 +15,10 @@ impl DictionaryLoader {
 
         let word_count: usize = lines
             .next()
-            .ok_or(io::Error::new(io::ErrorKind::InvalidData, "Missing word count"))??
+            .ok_or(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "Missing word count",
+            ))??
             .parse()
             .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, "Invalid word count"))?;
 
@@ -29,7 +32,10 @@ impl DictionaryLoader {
         Ok(word_count)
     }
 
-    pub fn load_affix_rules<P: AsRef<Path>>(aff_path: P, affix_rules: &mut AffixRules) -> io::Result<()> {
+    pub fn load_affix_rules<P: AsRef<Path>>(
+        aff_path: P,
+        affix_rules: &mut AffixRules,
+    ) -> io::Result<()> {
         let file = fs::File::open(aff_path)?;
         let reader = io::BufReader::new(file);
 
@@ -48,7 +54,8 @@ impl DictionaryLoader {
             }
 
             if (parts[0] == "PFX" || parts[0] == "SFX") && parts.len() == 4 {
-                let (rule_type, flag, cross_product, count) = (parts[0], parts[1], parts[2], parts[3]);
+                let (rule_type, flag, cross_product, count) =
+                    (parts[0], parts[1], parts[2], parts[3]);
                 expected_entries = count.parse().unwrap_or(0);
                 current_rule = Some(AffixRule {
                     rule_type: rule_type.to_string(),

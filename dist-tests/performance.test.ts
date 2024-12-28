@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
-import SpellChecker from "../dist/index";
 import { join } from "path";
 import { performance } from "perf_hooks";
+import SpellChecker from "../dist/index";
 
 describe("SpellChecker Performance", () => {
   const ITERATIONS = 10000;

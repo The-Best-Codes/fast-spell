@@ -24,6 +24,7 @@ lto = true
 panic = 'unwind'
 incremental = false
 codegen-units = 1
+strip = true
 
 [profile.release]
 opt-level = 3
@@ -31,9 +32,10 @@ debug = false
 debug-assertions = false
 overflow-checks = false
 lto = true
-panic = 'unwind'
+panic = 'abort'
 incremental = false
 codegen-units = 1
+strip = true
 
 [[bench]]
 name = "spell_checker"

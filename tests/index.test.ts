@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import SpellChecker from "../src/index";
 import { join } from "path";
+import SpellChecker from "../src/index";
 
 describe("SpellChecker", () => {
   const spellChecker = new SpellChecker(

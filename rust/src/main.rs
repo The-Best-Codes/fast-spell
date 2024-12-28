@@ -1,17 +1,19 @@
-mod trie;
 mod affix_rules;
 mod dictionary_loader;
+mod trie;
 
-use crate::trie::Trie;
 use crate::affix_rules::AffixRules;
 use crate::dictionary_loader::DictionaryLoader;
+use crate::trie::Trie;
 use std::collections::HashMap;
 
 pub struct SpellChecker {
     trie: Trie,
     affix_rules: AffixRules,
+    #[allow(dead_code)]
     suggestion_cache: HashMap<String, Vec<String>>,
     word_check_cache: HashMap<String, bool>,
+    #[allow(dead_code)]
     suggestion_cache_size: usize,
     word_check_cache_size: usize,
 }

@@ -1,16 +1,15 @@
-use rustc_hash::FxHashMap;
 use lasso::{Rodeo, Spur};
-use smallvec::{SmallVec, smallvec};
 use rayon::prelude::*;
-use std::num::NonZeroUsize;
+use rustc_hash::FxHashMap;
+use smallvec::{smallvec, SmallVec};
 
-mod trie;
 mod affix_rules;
 mod dictionary_loader;
+mod trie;
 
-pub use crate::trie::Trie;
-pub use crate::affix_rules::{AffixRules, AffixRule, AffixEntry};
+pub use crate::affix_rules::{AffixEntry, AffixRule, AffixRules};
 pub use crate::dictionary_loader::DictionaryLoader;
+pub use crate::trie::Trie;
 
 const CACHE_EVICTION_PERCENTAGE: usize = 10;
 const TYPICAL_MAX_AFFIXES: usize = 4;
@@ -31,8 +30,16 @@ impl SpellChecker {
         // Load dictionary and rules in parallel
         rayon::join(
             || DictionaryLoader::load_dictionary(dic_path, &mut trie),
-            || DictionaryLoader::load_affix_rules(aff_path, &mut affix_rules)
-        );
+            || DictionaryLoader::load_affix_rules(aff_path, &mut affix_rules),
+        )
+        .0
+        .expect("Failed to load dictionary");
+        rayon::join(
+            || DictionaryLoader::load_dictionary(dic_path, &mut trie),
+            || DictionaryLoader::load_affix_rules(aff_path, &mut affix_rules),
+        )
+        .1
+        .expect("Failed to load affix rules");
 
         SpellChecker {
             trie,
@@ -62,9 +69,12 @@ impl SpellChecker {
 
         // Slow path: check affixes
         let mut base_words: SmallVec<[String; TYPICAL_MAX_AFFIXES]> = smallvec![];
-        self.affix_rules.find_base_words_into(&word_lower, &mut base_words);
+        self.affix_rules
+            .find_base_words_into(&word_lower, &mut base_words);
 
-        let result = base_words.par_iter().any(|base_word| self.trie.search(base_word));
+        let result = base_words
+            .par_iter()
+            .any(|base_word| self.trie.search(base_word));
 
         self.cache_word_check(word_id, result);
         result
@@ -74,7 +84,8 @@ impl SpellChecker {
     fn cache_word_check(&mut self, word_id: Spur, result: bool) {
         if self.word_check_cache.len() >= self.word_check_cache_size {
             let to_remove = self.word_check_cache_size * CACHE_EVICTION_PERCENTAGE / 100;
-            let keys: SmallVec<[Spur; 1000]> = self.word_check_cache
+            let keys: SmallVec<[Spur; 1000]> = self
+                .word_check_cache
                 .keys()
                 .take(to_remove)
                 .copied()

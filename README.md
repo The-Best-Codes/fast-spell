@@ -27,7 +27,7 @@ import SpellChecker from "fast-spell";
 // Initialize with dictionary and affix rules files
 const spellChecker = new SpellChecker(
   "path/to/dictionary.dic",
-  "path/to/rules.aff"
+  "path/to/rules.aff",
 );
 
 // Check if a word is spelled correctly

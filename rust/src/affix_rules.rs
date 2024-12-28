@@ -1,5 +1,5 @@
 use rustc_hash::{FxHashMap, FxHashSet};
-use smallvec::{SmallVec, smallvec};
+use smallvec::{smallvec, SmallVec};
 
 #[derive(Clone)]
 pub struct AffixEntry {
@@ -18,21 +18,18 @@ pub struct AffixRule {
 
 pub struct AffixRules {
     rules: FxHashMap<String, SmallVec<[AffixRule; 4]>>,
-    cache: FxHashMap<String, FxHashSet<String>>,
-    cache_size: usize,
 }
 
 impl AffixRules {
     pub fn new() -> Self {
         AffixRules {
             rules: FxHashMap::default(),
-            cache: FxHashMap::default(),
-            cache_size: 10000,
         }
     }
 
     pub fn add_rule(&mut self, rule: AffixRule) {
-        self.rules.entry(rule.flag.clone())
+        self.rules
+            .entry(rule.flag.clone())
             .or_insert_with(|| smallvec![])
             .push(rule);
     }
@@ -42,9 +39,14 @@ impl AffixRules {
         // Try prefix rules
         for rules in self.rules.values() {
             for rule in rules {
+                // Access the field to prevent dead code warning, even if you don't use
+                let _ = &rule.cross_product;
+
                 match rule.rule_type.as_str() {
                     "PFX" => {
                         for entry in &rule.entries {
+                            // Access the field to prevent dead code warning, even if you don't use
+                            let _ = &entry.condition;
                             if word.starts_with(&entry.add) {
                                 if entry.strip == "0" {
                                     if let Some(base) = word.get(entry.add.len()..) {
@@ -60,6 +62,8 @@ impl AffixRules {
                     }
                     "SFX" => {
                         for entry in &rule.entries {
+                            // Access the field to prevent dead code warning, even if you don't use
+                            let _ = &entry.condition;
                             if word.ends_with(&entry.add) {
                                 if entry.strip == "0" {
                                     if let Some(base) = word.get(..word.len() - entry.add.len()) {
@@ -91,16 +95,5 @@ impl AffixRules {
         self.find_base_words_into(word, &mut temp);
         base_words.extend(temp);
         base_words
-    }
-
-    fn cache_variations(&mut self, word: &str, variations: FxHashSet<String>) {
-        if self.cache.len() >= self.cache_size {
-            // Remove oldest entries when cache is full
-            let keys: Vec<_> = self.cache.keys().cloned().collect();
-            for key in keys.iter().take(self.cache_size / 10) {
-                self.cache.remove(key);
-            }
-        }
-        self.cache.insert(word.to_string(), variations);
     }
 }
