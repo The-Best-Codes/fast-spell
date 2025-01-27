@@ -1,6 +1,6 @@
 {
   "name": "fast-spell",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "The-Best-Codes",
   "description": "A fast and lightweight spell checker library",
   "license": "MIT",
@@ -37,12 +37,12 @@
     "lightweight"
   ],
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
-    "@types/bun": "^1.1.16",
-    "bun-types": "^1.1.43",
-    "eslint": "^9.17.0",
+    "@eslint/js": "^9.19.0",
+    "@types/bun": "^1.2.0",
+    "bun-types": "^1.2.0",
+    "eslint": "^9.19.0",
     "globals": "^15.14.0",
-    "typescript-eslint": "^8.19.1"
+    "typescript-eslint": "^8.21.0"
   },
   "peerDependencies": {
     "typescript": "^5.7.3"
