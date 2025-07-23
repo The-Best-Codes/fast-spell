@@ -40,7 +40,10 @@ export class DictionaryLoader {
       );
     }
 
-    const { readFileSync } = require("fs");
+    // Use indirect require to avoid ESLint no-require-imports error
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const nodeRequire = (global as any).require || require;
+    const { readFileSync } = nodeRequire("fs");
     const content = readFileSync(filePath, "utf8");
     return this.parseDictionaryContent(content, trie);
   }
@@ -55,7 +58,10 @@ export class DictionaryLoader {
       );
     }
 
-    const { readFileSync } = require("fs");
+    // Use indirect require to avoid ESLint no-require-imports error
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const nodeRequire = (global as any).require || require;
+    const { readFileSync } = nodeRequire("fs");
     const content = readFileSync(filePath, "utf8");
     this.parseAffixContent(content, affixRules);
   }
