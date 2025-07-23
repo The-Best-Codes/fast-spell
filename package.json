@@ -15,7 +15,7 @@
   "scripts": {
     "build": "bun run build.ts && bun run build.types",
     "build.ts": "bun build ./src/index.ts --outdir ./dist --target node --minify",
-    "build.types": "rm -rf dist/*.d.ts && tsc --project tsconfig.json --emitDeclarationOnly --declarationDir ./dist && find dist -name '*.d.ts' ! -name 'index.d.ts' -type f -delete",
+    "build.types": "rm -rf dist/*.d.ts && tsc --project tsconfig.json --emitDeclarationOnly --declarationDir ./dist",
     "lint": "bunx eslint .",
     "test": "bun test",
     "clean": "rm -rf dist",
