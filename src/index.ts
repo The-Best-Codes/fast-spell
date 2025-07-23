@@ -299,4 +299,4 @@ export class SpellChecker {
 }
 
 export default SpellChecker;
-export { DictionarySource } from "./dictionary-loader";
+export * from "./dictionary-loader";
