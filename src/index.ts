@@ -1,5 +1,5 @@
 import { AffixRules } from "./affix-rules";
-import { DictionaryLoader } from "./dictionary-loader";
+import { DictionaryLoader, DictionarySource } from "./dictionary-loader";
 import { Trie } from "./trie";
 
 export class SpellChecker {
@@ -17,9 +17,48 @@ export class SpellChecker {
     this.wordCheckCache = new Map();
 
     if (dicPath && affPath) {
-      DictionaryLoader.loadDictionary(dicPath, this.trie);
-      DictionaryLoader.loadAffixRules(affPath, this.affixRules);
+      DictionaryLoader.loadDictionarySync(dicPath, this.trie);
+      DictionaryLoader.loadAffixRulesSync(affPath, this.affixRules);
     }
+  }
+
+  /**
+   * Create a SpellChecker instance with async loading support
+   * Supports file paths, URLs, and content provider functions
+   */
+  static async create(
+    dicSource?: DictionarySource,
+    affSource?: DictionarySource,
+  ): Promise<SpellChecker> {
+    const spellChecker = new SpellChecker();
+
+    if (dicSource && affSource) {
+      await Promise.all([
+        DictionaryLoader.loadDictionary(dicSource, spellChecker.trie),
+        DictionaryLoader.loadAffixRules(affSource, spellChecker.affixRules),
+      ]);
+    }
+
+    return spellChecker;
+  }
+
+  /**
+   * Load dictionary and affix rules after instantiation
+   */
+  async loadDictionaries(
+    dicSource: DictionarySource,
+    affSource: DictionarySource,
+  ): Promise<void> {
+    // Clear existing data
+    this.trie = new Trie();
+    this.affixRules = new AffixRules();
+    this.suggestionCache.clear();
+    this.wordCheckCache.clear();
+
+    await Promise.all([
+      DictionaryLoader.loadDictionary(dicSource, this.trie),
+      DictionaryLoader.loadAffixRules(affSource, this.affixRules),
+    ]);
   }
 
   public check(word: string): boolean {
@@ -260,3 +299,4 @@ export class SpellChecker {
 }
 
 export default SpellChecker;
+export { DictionarySource } from "./dictionary-loader";
