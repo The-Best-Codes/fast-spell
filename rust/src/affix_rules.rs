@@ -20,6 +20,12 @@ pub struct AffixRules {
     rules: FxHashMap<String, SmallVec<[AffixRule; 4]>>,
 }
 
+impl Default for AffixRules {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AffixRules {
     pub fn new() -> Self {
         AffixRules {

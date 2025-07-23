@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use fast_spell::{SpellChecker};
+use fast_spell::SpellChecker;
 use std::time::{Duration, Instant};
 
 const ITERATIONS: usize = 1000;
@@ -45,16 +45,40 @@ fn run_benchmark(name: &str, iterations: usize, mut f: impl FnMut()) -> Duration
 
 fn spell_checker_benchmark(c: &mut Criterion) {
     let correct_words = vec![
-        "test", "hello", "world", "programming", "computer",
-        "algorithm", "testing", "development", "software", "engineering",
+        "test",
+        "hello",
+        "world",
+        "programming",
+        "computer",
+        "algorithm",
+        "testing",
+        "development",
+        "software",
+        "engineering",
     ];
     let incorrect_words = vec![
-        "testt", "helo", "wrld", "programing", "compuper",
-        "algoritm", "testting", "devlopment", "sofware", "enginering",
+        "testt",
+        "helo",
+        "wrld",
+        "programing",
+        "compuper",
+        "algoritm",
+        "testting",
+        "devlopment",
+        "sofware",
+        "enginering",
     ];
     let affixed_words = vec![
-        "testing", "programmer", "development", "computational", "engineering",
-        "algorithms", "developer", "tested", "programming", "engineered",
+        "testing",
+        "programmer",
+        "development",
+        "computational",
+        "engineering",
+        "algorithms",
+        "developer",
+        "tested",
+        "programming",
+        "engineered",
     ];
 
     let mut spell_checker = SpellChecker::new("data/en_US-web.dic", "data/en_US-web.aff");

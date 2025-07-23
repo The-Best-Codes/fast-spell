@@ -18,6 +18,12 @@ pub struct Trie {
     root: TrieNode,
 }
 
+impl Default for Trie {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Trie {
     pub fn new() -> Self {
         Trie {

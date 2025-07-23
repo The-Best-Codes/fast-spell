@@ -78,9 +78,9 @@ fn main() {
     let test_words = vec!["example", "running", "jumping", "xyz123"];
     for word in test_words {
         if spell_checker.check(word) {
-            println!("'{}' is a valid word.", word);
+            println!("'{word}' is a valid word.");
         } else {
-            println!("'{}' is not a valid word.", word);
+            println!("'{word}' is not a valid word.");
         }
     }
 }
