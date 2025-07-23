@@ -22,11 +22,9 @@ impl DictionaryLoader {
             .parse()
             .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, "Invalid word count"))?;
 
-        for line in lines.take(word_count) {
-            if let Ok(word_line) = line {
-                let word = word_line.split('/').next().unwrap_or("");
-                trie.insert(word);
-            }
+        for line in lines.take(word_count).flatten() {
+            let word = line.split('/').next().unwrap_or("");
+            trie.insert(word);
         }
 
         Ok(word_count)

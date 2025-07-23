@@ -53,15 +53,11 @@ impl AffixRules {
                         for entry in &rule.entries {
                             // Access the field to prevent dead code warning, even if you don't use
                             let _ = &entry.condition;
-                            if word.starts_with(&entry.add) {
-                                if entry.strip == "0" {
-                                    if let Some(base) = word.get(entry.add.len()..) {
-                                        base_words.push(base.to_string());
-                                    }
-                                } else if word.len() > entry.add.len() {
-                                    if let Some(base) = word.get(entry.add.len()..) {
-                                        base_words.push(base.to_string());
-                                    }
+                            if word.starts_with(&entry.add)
+                                && (entry.strip == "0" || word.len() > entry.add.len())
+                            {
+                                if let Some(base) = word.get(entry.add.len()..) {
+                                    base_words.push(base.to_string());
                                 }
                             }
                         }
@@ -70,15 +66,11 @@ impl AffixRules {
                         for entry in &rule.entries {
                             // Access the field to prevent dead code warning, even if you don't use
                             let _ = &entry.condition;
-                            if word.ends_with(&entry.add) {
-                                if entry.strip == "0" {
-                                    if let Some(base) = word.get(..word.len() - entry.add.len()) {
-                                        base_words.push(base.to_string());
-                                    }
-                                } else if word.len() > entry.add.len() {
-                                    if let Some(base) = word.get(..word.len() - entry.add.len()) {
-                                        base_words.push(base.to_string());
-                                    }
+                            if word.ends_with(&entry.add)
+                                && (entry.strip == "0" || word.len() > entry.add.len())
+                            {
+                                if let Some(base) = word.get(..word.len() - entry.add.len()) {
+                                    base_words.push(base.to_string());
                                 }
                             }
                         }
